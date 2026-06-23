@@ -379,6 +379,10 @@ void handleApiCommand() {
 
 void setup() {
   Serial.begin(115200);
+  // S3 native USB-CDC: when the board is plugged into a host but nothing is reading the
+  // port, a full TX buffer makes Serial.print() BLOCK for seconds, freezing the control
+  // loop and making the web remote laggy. Timeout 0 = drop bytes instead of blocking.
+  Serial.setTxTimeoutMs(0);
   randomSeed(micros());
   
   // I2C Init for ESP32
@@ -502,7 +506,7 @@ void setup() {
 void loop() {
   // Process DNS requests for captive portal
   dnsServer.processNextRequest();
-  
+
   server.handleClient();
   updateAnimatedFace();
   updateIdleBlink();
@@ -786,7 +790,7 @@ void updateIdleBlink() {
 }
 
 // ====== HELPERS ======
-void setServoAngle(uint8_t channel, int angle) { 
+void setServoAngle(uint8_t channel, int angle) {
   if (channel < 8) {
     int adjustedAngle = constrain(angle + servoSubtrim[channel], 0, 180);
     servos[channel].write(adjustedAngle);
