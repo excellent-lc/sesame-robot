@@ -18,9 +18,9 @@
 // --- Station Mode Configuration (Optional) ---
 // Set these to connect to your home/office WiFi network
 // Leave NETWORK_SSID empty to disable station mode
-#define NETWORK_SSID ""  // Your WiFi network name
-#define NETWORK_PASS ""  // Your WiFi password
-#define ENABLE_NETWORK_MODE false  // Set to true to enable network connection attempts
+#define NETWORK_SSID "海创园606"  // Your WiFi network name (2.4GHz only — ESP32 can't use 5G)
+#define NETWORK_PASS "surgicalai"  // Your WiFi password
+#define ENABLE_NETWORK_MODE true  // Set to true to enable network connection attempts
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -431,6 +431,7 @@ void setup() {
   
   // --- ACCESS POINT CONFIGURATION ---
   WiFi.softAP(AP_SSID, AP_PASS);
+  WiFi.setSleep(false);  // disable WiFi modem-sleep -> removes ~100-300ms per-command remote-control lag
   IPAddress myIP = WiFi.softAPIP();
   
   Serial.print("AP Created. IP: ");
