@@ -35,7 +35,15 @@
 //#define I2C_SDA 21
 //#define I2C_SCL 22
 
-// I2C Pins for S2 Mini Board
+// I2C Pins for Lolin S2 Mini Board (Legacy)
+//#define I2C_SDA 33
+//#define I2C_SCL 35
+
+// I2C Pins for Lolin S3 Mini Board
+// GPIO33/35 are free on the S3FH4R2 (quad flash + PSRAM, not octal) and broken out
+// on the right header. I2C is remappable via the ESP32 GPIO matrix, so these work
+// regardless of the board's SCL/SDA silkscreen.
+// Wire the OLED to match the firmware (NOT the silkscreen): SDA -> GPIO33, SCL -> GPIO35.
 #define I2C_SDA 33
 #define I2C_SCL 35
 
@@ -92,8 +100,17 @@ Servo servos[8];
 // Sesame Distro Board V1 Pinout (Legacy)
 //const int servoPins[8] = {15, 2, 23, 19, 4, 16, 17, 18};
 
-// Lolin S2 Mini Pinout
-const int servoPins[8] = {1, 2, 4, 6, 8, 10, 13, 14};
+// Lolin S2 Mini Pinout (Legacy)
+//const int servoPins[8] = {1, 2, 4, 6, 8, 10, 13, 14};
+
+// Lolin S3 Mini Pinout
+// Same physical holes as the S2 build (left inner header column, top -> bottom),
+// only the GPIO numbers change. Position-for-position remap of the S2 array:
+//   S2 {1, 2, 4, 6, 8, 10, 13, 14}  ->  S3 {1, 3, 5, 6, 7, 8, 9, 14}
+// NOTE: GPIO3 (array index 1 / "R2") is an ESP32-S3 strapping pin. It floats during
+// boot before the firmware runs, so that servo may twitch once at power-up; it works
+// fine as a PWM output afterwards.
+const int servoPins[8] = {1, 3, 5, 6, 7, 8, 9, 14};
 
 // Subtrim values for each servo (offset in degrees)
 int8_t servoSubtrim[8] = {0, 0, 0, 0, 0, 0, 0, 0};

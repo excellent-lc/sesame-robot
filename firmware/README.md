@@ -58,6 +58,7 @@ This document provides technical information on the firmware architecture, contr
 
    - Go to **Tools → Board**
    - For Lolin S2 Mini: Select "LOLIN S2 Mini"
+   - For Lolin S3 Mini: Select "LOLIN S3 Mini"
    - For Sesame Distro Board V1: Select "ESP32 Dev Module"
    - For Sesame Distro Board V2 or V3: Select "ESP32S3 Dev Module"
 4. **Configure board settings**:
@@ -65,6 +66,10 @@ This document provides technical information on the firmware architecture, contr
    - **For Lolin S2 Mini**:
      - **Upload Speed**: 921600
      - **USB CDC On Boot**: "Enabled"
+     - **Partition Scheme**: "Default 4MB with spiffs"
+   - **For Lolin S3 Mini (ESP32-S3)**:
+     - **USB CDC On Boot**: "Enabled" (Required for Serial Monitor)
+     - **Flash Mode**: "QIO 80MHz"
      - **Partition Scheme**: "Default 4MB with spiffs"
    - **For Distro Board V2 or V3 (ESP32-S3)**:
      - **USB CDC On Boot**: "Enabled" (Required for Serial Monitor)
@@ -78,6 +83,7 @@ This document provides technical information on the firmware architecture, contr
    - Open [sesame-firmware-main.ino](sesame-firmware-main.ino)
    - Find the pin configuration section (around line 55-65)
    - **If you built with the Lolin S2 Mini:** Uncomment the S2 Mini `servoPins` array and `I2C_SDA`/`I2C_SCL` defines. Comment out the Distro Board section.
+   - **If you built with the Lolin S3 Mini:** Uncomment the S3 Mini `servoPins` array and `I2C_SDA`/`I2C_SCL` defines (this is the default in the shipped file). Comment out the others.
    - **If you built with the Distro Board V3:** Uncomment the V3 `servoPins` array and `I2C_SDA`/`I2C_SCL` defines. Comment out others.
    - **If you built with the Distro Board V2:** Uncomment the V2 `servoPins` array and `I2C_SDA`/`I2C_SCL` defines. Comment out others.
    - **If you built with the Distro Board V1:** Uncomment the V1 `servoPins` array and `I2C_SDA`/`I2C_SCL` defines. Comment out others.
@@ -721,6 +727,30 @@ The firmware abstracts pin definitions via the `servoPins` array. The default co
 | Motor 7           | 7           | 14           | L4                           |
 | **I2C SDA** | -           | **33** | SSD1306 Data (Hardware I2C)  |
 | **I2C SCL** | -           | **35** | SSD1306 Clock (Hardware I2C) |
+
+#### Lolin S3 Mini (ESP32-S3)
+
+Drop-in upgrade from the S2 Mini build: the servos stay in the **same physical holes** (left inner header column, top → bottom) — only the GPIO numbers change because the S3 Mini maps different GPIOs to those positions. The values below are a position-for-position remap of the S2 array.
+
+| Motor/Component   | Array Index | GPIO Pin     | Notes                        |
+| ----------------- | ----------- | ------------ | ---------------------------- |
+| Motor 0           | 0           | 1            | R1                           |
+| Motor 1           | 1           | 3            | R2 (strapping pin — see note)|
+| Motor 2           | 2           | 5            | L1                           |
+| Motor 3           | 3           | 6            | L2                           |
+| Motor 4           | 4           | 7            | R4                           |
+| Motor 5           | 5           | 8            | R3                           |
+| Motor 6           | 6           | 9            | L3                           |
+| Motor 7           | 7           | 14           | L4                           |
+| **I2C SDA** | -           | **33** | SSD1306 Data (Hardware I2C)  |
+| **I2C SCL** | -           | **35** | SSD1306 Clock (Hardware I2C) |
+
+> [!IMPORTANT]
+> **OLED wiring on the S3 Mini differs from the S2 Mini in two ways:**
+> 1. **GPIO33/35 sit at different physical holes than on the S2** — on the S3, GPIO33 is the top pin of the right *inner* column and GPIO35 is the 4th pin down of the right *outer* column. Wire by GPIO number, not by reusing the S2 hole positions.
+> 2. **Follow the firmware, not the silkscreen.** The S3 silkscreen labels GPIO35 as "SDA", but the firmware uses SDA = GPIO33, SCL = GPIO35. Connect OLED **SDA → GPIO33** and **SCL → GPIO35**. (I2C is remapped via the GPIO matrix, so any pins work; just match the firmware.)
+>
+> GPIO3 (Motor 1) is an ESP32-S3 strapping pin: it floats during boot, so that servo may twitch once at power-up, then behaves normally.
 
 #### Sesame Distro Board V1 (ESP32-WROOM32)
 
